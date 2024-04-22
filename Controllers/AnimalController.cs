@@ -65,58 +65,52 @@ public class DatabaseController : ControllerBase
     [HttpPost]
     public ActionResult AddAnimal(CreateAnimalRequest request)
     {
-        using (var sqlConnection = new SqlConnection(_configuration.GetConnectionString("Default")))
-        {
-            var sqlCommand = new SqlCommand(
-                "INSERT INTO Animal VALUES (@1, @2, @3, @4); SELECT CAST(SCOPE_IDENTITY() as int)",
-                sqlConnection
-            );
-            sqlCommand.Parameters.AddWithValue("@1", request.Name);
-            sqlCommand.Parameters.AddWithValue("@2", request.Description);
-            sqlCommand.Parameters.AddWithValue("@3", request.Category);
-            sqlCommand.Parameters.AddWithValue("@4", request.Area);
-            sqlCommand.Connection.Open();
+        using var sqlConnection = new SqlConnection(_configuration.GetConnectionString("Default"));
+        var sqlCommand = new SqlCommand(
+            "INSERT INTO Animal VALUES (@1, @2, @3, @4); SELECT CAST(SCOPE_IDENTITY() as int)",
+            sqlConnection
+        );
+        sqlCommand.Parameters.AddWithValue("@1", request.Name);
+        sqlCommand.Parameters.AddWithValue("@2", request.Description);
+        sqlCommand.Parameters.AddWithValue("@3", request.Category);
+        sqlCommand.Parameters.AddWithValue("@4", request.Area);
+        sqlCommand.Connection.Open();
 
-            var id = sqlCommand.ExecuteScalar();
+        var id = sqlCommand.ExecuteScalar();
 
-            return Created($"students/{id}", new CreateAnimalResponse((int)id, request));
-        }
+        return Created($"students/{id}", new CreateAnimalResponse((int)id, request));
     }
 
     [HttpDelete("{id}")]
     public ActionResult DeleteAnimal(int id)
     {
-        using (var sqlConnection = new SqlConnection(_configuration.GetConnectionString("Default")))
-        {
-            var sqlCommand = new SqlCommand($"DELETE FROM Animal WHERE Id_Animal = @1", sqlConnection);
-            sqlCommand.Parameters.AddWithValue("@1", id);
-            sqlCommand.Connection.Open();
+        using var sqlConnection = new SqlConnection(_configuration.GetConnectionString("Default"));
+        var sqlCommand = new SqlCommand($"DELETE FROM Animal WHERE Id_Animal = @1", sqlConnection);
+        sqlCommand.Parameters.AddWithValue("@1", id);
+        sqlCommand.Connection.Open();
 
-            var affectedRows = sqlCommand.ExecuteNonQuery();
+        var affectedRows = sqlCommand.ExecuteNonQuery();
 
-            return affectedRows == 0 ? NotFound() : NoContent();
-        }
+        return affectedRows == 0 ? NotFound() : NoContent();
     }
 
     [HttpPut("{id}")]
     public ActionResult UpdateAnimal(int id, UpdateAnimalRequest request)
     {
-        using (var sqlConnection = new SqlConnection(_configuration.GetConnectionString("Default")))
-        {
-            var sqlCommand = new SqlCommand(
-                "UPDATE Animal SET Name = @1, Description = @2, Category = @3, Area = @4 WHERE Id_Animal = @5",
-                sqlConnection
-            );
-            sqlCommand.Parameters.AddWithValue("@1", request.Name);
-            sqlCommand.Parameters.AddWithValue("@2", request.Description);
-            sqlCommand.Parameters.AddWithValue("@3", request.Category);
-            sqlCommand.Parameters.AddWithValue("@4", request.Area);
-            sqlCommand.Parameters.AddWithValue("@5", id);
-            sqlCommand.Connection.Open();
+        using var sqlConnection = new SqlConnection(_configuration.GetConnectionString("Default"));
+        var sqlCommand = new SqlCommand(
+            "UPDATE Animal SET Name = @1, Description = @2, Category = @3, Area = @4 WHERE Id_Animal = @5",
+            sqlConnection
+        );
+        sqlCommand.Parameters.AddWithValue("@1", request.Name);
+        sqlCommand.Parameters.AddWithValue("@2", request.Description);
+        sqlCommand.Parameters.AddWithValue("@3", request.Category);
+        sqlCommand.Parameters.AddWithValue("@4", request.Area);
+        sqlCommand.Parameters.AddWithValue("@5", id);
+        sqlCommand.Connection.Open();
 
-            var affectedRows = sqlCommand.ExecuteNonQuery();
+        var affectedRows = sqlCommand.ExecuteNonQuery();
             
-            return affectedRows == 0 ? NotFound() : NoContent();
-        }
+        return affectedRows == 0 ? NotFound() : NoContent();
     }
 }
